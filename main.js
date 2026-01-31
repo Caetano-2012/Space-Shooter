@@ -32,7 +32,7 @@ let checaTiros;
 let posicaoHorizontal = larguraCenario / 2 - 50;
 let posicaoVertical = alturaCenario - alturaNave;
 let direcaoHorizontal = 0;
-let direcaoVetical = 0;
+let direcaoVertical = 0;
 
 const teclaPressionada = (tecla) => {
     if (tecla.key === "ArrowRight") {
@@ -40,17 +40,17 @@ const teclaPressionada = (tecla) => {
     } else if (tecla.key === "ArrowLeft") {
         direcaoHorizontal = -1;
     } else if (tecla.key === "ArrowDown") {
-        direcaoVetical = 1;
+        direcaoVertical = 1;
     } else if (tecla.key === "ArrowUp") {
-        direcaoVetical = -1;
+        direcaoVertical = -1;
     }
 }
 
 const teclaSolta = (tecla) => {
     if (tecla.key === "ArrowRight" || tecla.key === "ArrowLeft") {
         direcaoHorizontal = 0;
-    } else if (tecla.key === "ArrowDOwn" || tecla.key === "ArrowUp") {
-        direcaoVetical = 0;
+    } else if (tecla.key === "ArrowDown" || tecla.key === "ArrowUp") {
+        direcaoVertical = 0;
     }
 }
 
@@ -166,4 +166,96 @@ const moveNaveInimigas = () => {
             }
         }
     }
+}
+
+const naveInimigaDestruida = (posicaoLeftNaveInimiga, posicaoTopNaveInimiga) => {
+    const naveInimigaDestruida = document.createElement("div");
+    naveInimigaDestruida.className = "naveinimigadestruida";
+    naveInimigaDestruida.style.position = "absolute";
+    naveInimigaDestruida.style.width = "100px";
+    naveInimigaDestruida.style.height = "100px";
+    naveInimigaDestruida.style.backgroundImage = "url(eliminado.gif)";
+    naveInimigaDestruida.style.backgroundPosition = "center";
+    naveInimigaDestruida.style.backgroundRepeat = "no-repeat"
+    naveInimigaDestruida.style.backgroundSize = "contain";
+    naveInimigaDestruida.style.left = posicaoLeftNaveInimiga + "px";
+    naveInimigaDestruida.style.top = posicaoTopNaveInimiga + "px";
+    cenario.appendChild(naveInimigaDestruida);
+    audioExplosoes();
+    setTimeout(() => {cenario.removeChild(naveInimigaDestruida);}, 1000);
+}
+
+const explosaoNaveInimigaDestruida = (posicaoLeftNaveInimiga) => {
+    let styleExplosao = explosaoNaveInimiga.style;
+    const explosaoNaveInimiga = document.createElement("div");
+    explosaoNaveInimiga.className = "explosaonaveinimiga";
+    styleExplosao.position = "absolute";
+    styleExplosao.width = "100px";
+    styleExplosao.height = "100px";
+    styleExplosao.backgroundImage = "url(explosao.gif)";
+    styleExplosao.backgroundPosition = "center";
+    styleExplosao.backgroundRepeat = "no-repeat";
+    styleExplosao.backgroundSize = "contain";
+    styleExplosao.left = posicaoLeftNaveInimiga + "px";
+    styleExplosao.top = (alturaCenario - 100) + "px";
+    cenario.appendChild(explosaoNaveInimiga);
+    audioExplosoes();
+    setTimeout(() => {cenario.removeChild(explosaoNaveInimiga);}, 1000);
+}
+
+const audioExplosoes = () => {
+    const audioExplosaoNaveInimiga = document.createElement("audio");
+    audioExplosaoNaveInimiga.className="audioexplosoes";
+    audioExplosaoNaveInimiga.setAttribute("src", "destruido.mp3");
+    audioExplosaoNaveInimiga.play();
+    cenario.appendChild(audioExplosaoNaveInimiga);
+    audioExplosaoNaveInimiga.addEventListener("ended", () => {
+        audioExplosaoNaveInimiga.remove();
+    })
+}
+
+const colisao = () => {
+    const todasNavesInimigas = document.querySelectorAll(".inimigo");
+    const todosTiros = document.querySelectorAll(".tiro");
+    todasNavesInimigas.forEach((naveInimiga) => {
+        todosTiros.forEach((tiro) => {
+            const colisaoNaveInimiga = naveInimiga.getBoundingClientRect();
+            const colisaoTiro = tiro.getBoundingClientRect();
+            const posicaoNaveInimigaLeft  = naveInimiga.offsetLeft;
+            const posicaoNaveInimigaTop = naveInimiga.offsetTop;
+            let vidaAtualNaveInimiga = parseInt(naveInimiga.getAttribute("data-vida"));
+            if (
+                colisaoNaveInimiga.left < colisaoTiro.right &&
+                colisaoNaveInimiga.right < colisaoTiro.left &&
+                colisaoNaveInimiga.top < colisaoTiro.bottom &&
+                colisaoNaveInimiga.bottom < colisaoTiro.top
+            ) {
+                vidaAtualNaveInimiga--;
+                tiro.remove();
+                if (vidaAtualNaveInimiga === 0) {
+                    pontosAtual += 10;
+                    pontos.textContent = `Pontos: ${pontosAtual}`;
+                    naveInimiga.remove();
+                    naveInimigaDestruida(posicaoNaveInimigaLeft, posicaoNaveInimigaTop);
+                } else {
+                    naveInimiga.setAttribute("data-vida", vidaAtualNaveInimiga);
+                }
+            }
+        })
+    })
+}
+
+const iniciarJogo = () => {
+    document.addEventListener("keydown", teclaPressionada);
+    document.addEventListener("keyup", teclaSolta);
+    checaMoveNave = setInterval(moveNave, 50);
+    checaMoveTiros = setInterval(moveTiros, 50)
+    checaMoveNaveInimigas = setInterval(moveNaveInimigas, 50);
+    checaColisao = setInterval(colisao, 10);
+    checaNaveInimigas = setInterval(naveInimigas, 1000);
+    checaTiros = setInterval(atirar, 10);
+    botaoIniciar.style.display = "none";
+    cenario.style.animation = "animarCenario 10s infinite linear";
+    audioJogo.loop = true;
+    audioJogo.play();
 }
