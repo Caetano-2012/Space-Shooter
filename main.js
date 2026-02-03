@@ -101,7 +101,7 @@ const criaTiros = (posicaoLeftTiro, posicaoTopTiro) => {
     tiro.style.height = "10px";
     tiro.style.backgroundColor = "red";
     tiro.style.left = posicaoLeftTiro + "px";
-    tiro.style.left = posicaoTopTiro + "px";
+    tiro.style.top = posicaoTopTiro + "px";
     cenario.appendChild(tiro);
     audioTiros();
 }
@@ -109,7 +109,7 @@ const criaTiros = (posicaoLeftTiro, posicaoTopTiro) => {
 const audioTiros = () => {
     const audioDoTiro = document.createElement("audio");
     audioDoTiro.className = "audioTiro";
-    audioDoTiro.setAttribute("tiro.mp3");
+    audioDoTiro.setAttribute("src","tiro.mp3");
     audioDoTiro.play();
     cenario.appendChild(audioDoTiro);
     audioDoTiro.addEventListener("ended", () => {
@@ -138,7 +138,7 @@ const naveInimigas = () => {
     inimigo.setAttribute("data-vida", 5);
     inimigo.style.width = "100px";
     inimigo.style.height = "100px";
-    inimigo.style.backgroundImage = "enemy.gif";
+    inimigo.style.backgroundImage = "url(enemy.gif)";
     inimigo.style.backgroundPosition = "center";
     inimigo.style.bakgroundRepeat = "no-repeat";
     inimigo.style.backgroundSize = "contain";
@@ -154,9 +154,9 @@ const moveNaveInimigas = () => {
             let posicaoTopNaveInimiga = naveInimigas[i].offsetTop;
             let posicaoLeftNaveInimiga = naveInimigas[i].offsetLeft;
             posicaoTopNaveInimiga += velocidadeNaveInimigas;
-            naveInimigas[i].style.top = posicaoTopNaveInimiga = posicaoTopNaveInimiga + "px";
+            naveInimigas[i].style.top = posicaoTopNaveInimiga + "px";
             if (posicaoTopNaveInimiga > alturaCenario) {
-                vaidaAtual -= 5;
+                vidaAtual -= 5;
                 vida.textContent = `Vida: ${vidaAtual}`;
                 explosaoNaveInimigaDestruida(posicaoLeftNaveInimiga);
                 if (vidaAtual <= 0) {
@@ -186,8 +186,8 @@ const naveInimigaDestruida = (posicaoLeftNaveInimiga, posicaoTopNaveInimiga) => 
 }
 
 const explosaoNaveInimigaDestruida = (posicaoLeftNaveInimiga) => {
-    let styleExplosao = explosaoNaveInimiga.style;
     const explosaoNaveInimiga = document.createElement("div");
+    let styleExplosao = explosaoNaveInimiga.style;
     explosaoNaveInimiga.className = "explosaonaveinimiga";
     styleExplosao.position = "absolute";
     styleExplosao.width = "100px";
@@ -258,4 +258,35 @@ const iniciarJogo = () => {
     cenario.style.animation = "animarCenario 10s infinite linear";
     audioJogo.loop = true;
     audioJogo.play();
+}
+
+const gameOver = () => {
+    document.removeEventListener("keydown", teclaPressionada);
+    document.removeEventListener("keyup", teclaSolta);
+    clearInterval(checaMoveNaveInimigas);
+    clearInterval(checaNaveInimigas);
+    clearInterval(checaMoveTiros);
+    clearInterval(checaMoveNave);
+    clearInterval(checaColisao);
+    const perdeu = document.createElement("div");
+    perdeu.style.position = "absolute";
+    perdeu.innerHTML = "GAME OVER";
+    perdeu.style.backgroundColor = "black";
+    perdeu.style.color = "red";
+    perdeu.style.left = "50%";
+    perdeu.style.top = "50%";
+    perdeu.style.padding = "10px 20px";
+    perdeu.style.borderRadius = "50px";
+    perdeu.style.transform = "translate(-50%, -50%)";
+    cenario.appendChild(perdeu);
+    cenario.removeChild(nave);
+    cenario.style.animation = "none";
+    const navesInimigas = document.querySelectorAll(".inimigo");
+    navesInimigas.forEach((inimigos) => {
+        inimigos.remove();
+    });
+    const todosTiros = document.querySelectorAll(".tiro");
+    todosTiros.forEach((tiro) => {
+        cenario.removeChild(tiro);
+    });
 }
