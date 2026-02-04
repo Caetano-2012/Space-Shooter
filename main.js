@@ -261,6 +261,7 @@ const iniciarJogo = () => {
 }
 
 const gameOver = () => {
+    estaAtirando = false;
     document.removeEventListener("keydown", teclaPressionada);
     document.removeEventListener("keyup", teclaSolta);
     clearInterval(checaMoveNaveInimigas);
@@ -268,6 +269,7 @@ const gameOver = () => {
     clearInterval(checaMoveTiros);
     clearInterval(checaMoveNave);
     clearInterval(checaColisao);
+    clearInterval(checaTiros);
     const perdeu = document.createElement("div");
     perdeu.style.position = "absolute";
     perdeu.innerHTML = "GAME OVER";
@@ -285,8 +287,5 @@ const gameOver = () => {
     navesInimigas.forEach((inimigos) => {
         inimigos.remove();
     });
-    const todosTiros = document.querySelectorAll(".tiro");
-    todosTiros.forEach((tiro) => {
-        cenario.removeChild(tiro);
-    });
+    document.querySelectorAll(".tiro").forEach(tiro => tiro.remove());
 }
