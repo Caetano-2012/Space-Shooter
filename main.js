@@ -226,9 +226,9 @@ const colisao = () => {
             let vidaAtualNaveInimiga = parseInt(naveInimiga.getAttribute("data-vida"));
             if (
                 colisaoNaveInimiga.left < colisaoTiro.right &&
-                colisaoNaveInimiga.right < colisaoTiro.left &&
+                colisaoNaveInimiga.right > colisaoTiro.left &&
                 colisaoNaveInimiga.top < colisaoTiro.bottom &&
-                colisaoNaveInimiga.bottom < colisaoTiro.top
+                colisaoNaveInimiga.bottom > colisaoTiro.top
             ) {
                 vidaAtualNaveInimiga--;
                 tiro.remove();
